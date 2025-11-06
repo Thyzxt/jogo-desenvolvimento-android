@@ -22,17 +22,17 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 
-class MainActivity : ComponentActivity(){
+class MainActivity2 : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContent{
-            TelaMenu()
+            TelaLogin()
         }
     }
 }
 
 @Composable
-fun TelaMenu(){
+fun TelaLogin(){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -40,7 +40,7 @@ fun TelaMenu(){
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
-        TopBarMenu()
+        TopBarLogin()
 
         Spacer(modifier = Modifier.height(135.dp))
 
@@ -100,7 +100,7 @@ fun TelaMenu(){
 }
 
 @Composable
-fun OpcaoMenu(texto: String, cor: Color) {
+fun Login(texto: String, cor: Color) {
     Card(
         modifier = Modifier
             .fillMaxWidth(0.9f)
@@ -126,7 +126,7 @@ fun OpcaoMenu(texto: String, cor: Color) {
 }
 
 @Composable
-fun TopBarMenu(){
+fun TopBarLogin(){
 
     Row(
         modifier = Modifier
@@ -150,6 +150,6 @@ fun TopBarMenu(){
 
 @Preview(showBackground = true)
 @Composable
-fun MenuPreview() {
-    TelaMenu()
+fun LoginPreview() {
+    TelaLogin()
 }
