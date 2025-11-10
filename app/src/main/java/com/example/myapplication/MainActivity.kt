@@ -45,33 +45,24 @@ fun TelaMenu(){
         Spacer(modifier = Modifier.height(135.dp))
 
         Text(
-            text = "MODOS DE JOGO",
-            fontSize = 40.sp,
+            text = "IGUAL A 10",
+            fontSize = 46.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(135.dp))
+        Spacer(modifier = Modifier.height(130.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(0.8f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Center
         ){
 
             OpcaoMenu(
-                texto = "IGUAL A 10",
+                texto = "JOGAR",
                 cor = Color.Black
-            )
-
-            Icon(
-                imageVector = Icons.Filled.Info,
-                contentDescription = "Ir para Como Jogar",
-                modifier = Modifier
-                    .size(32.dp)
-                    .clickable {  },
-                tint = Color.Black
             )}
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -79,21 +70,26 @@ fun TelaMenu(){
         Row(
             modifier = Modifier.fillMaxWidth(0.8f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Center
         ){
 
             OpcaoMenu(
-                texto = "VALOR DE X",
+                texto = "COMO JOGAR",
                 cor = Color.Black
             )
+        }
 
-            Icon(
-                imageVector = Icons.Filled.Info,
-                contentDescription = "Ir para Como Jogar",
-                modifier = Modifier
-                    .size(32.dp)
-                    .clickable {  },
-                tint = Color.Black
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(0.8f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ){
+
+            OpcaoMenu(
+                texto = "CONFIGURAR",
+                cor = Color.Black
             )
         }
     }
@@ -148,8 +144,7 @@ fun TopBarMenu(){
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun MenuPreview() {
-    TelaMenu()
-}
+fun MenuPreview(){
+    TelaMenu()}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "994572931841",
+    "project_id": "igual-a-10-fecf0",
+    "storage_bucket": "igual-a-10-fecf0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994572931841:android:aba4fe5336be43ed628100",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVB8lW4zkck2uhFuAMDN6YgbEHsswRCiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
