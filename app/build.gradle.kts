@@ -65,6 +65,7 @@ dependencies {
 
 
 dependencies {
+    implementation(libs.androidx.compose.foundation)
     val nav_version = "2.9.6"
 
     implementation(libs.androidx.navigation.compose)
