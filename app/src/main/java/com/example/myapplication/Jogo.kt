@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +49,7 @@ class Jogo : ComponentActivity() {
             MyApplicationTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = Color(color = 0xFF2C2C2C) // Fundo escuro
+                    containerColor = Color(color = 0xFF2C2C2C)
                 ) { innerPadding ->
                     ButtonGrid(
                         modifier = Modifier.padding(innerPadding)
@@ -132,40 +133,12 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
     var text by remember { mutableStateOf("") }
     var nivelAtual by remember { mutableStateOf(1) }
 
-    // Os números agora são estados que podem mudar
     var primeiro by remember { mutableStateOf("") }
     var segundo by remember { mutableStateOf("") }
     var terceiro by remember { mutableStateOf("") }
     var quarto by remember { mutableStateOf("") }
 
-    // Este Effect é executado sempre que `nivelAtual` muda.
     LaunchedEffect(nivelAtual) {
-        // --- CÓDIGO FIREBASE (GENÉRICO) ---
-        // Este é o lugar para buscar os dados do nível no Firebase.
-        // Você precisará do SDK do Firebase configurado no seu projeto.
-        /*
-        val db = Firebase.firestore
-        db.collection("niveis").document(nivelAtual.toString())
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    primeiro = document.getString("primeiro") ?: "0"
-                    segundo = document.getString("segundo") ?: "0"
-                    terceiro = document.getString("terceiro") ?: "0"
-                    quarto = document.getString("quarto") ?: "0"
-                    text = "" // Limpa o campo de texto para a nova fase
-                } else {
-                    // Nível não encontrado, você pode tratar como fim de jogo
-                }
-            }
-            .addOnFailureListener { exception ->
-                // Tratar erro de conexão com o Firebase
-            }
-        */
-
-        // --- CÓDIGO PROVISÓRIO (para o app funcionar sem Firebase) ---
-        // Esta parte simula a busca de dados, gerando novos números.
-        // SUBSTITUA esta lógica pelo código do Firebase acima.
         primeiro = (nivelAtual).toString()
         segundo = (nivelAtual + 1).toString()
         terceiro = (nivelAtual + 2).toString()
@@ -175,45 +148,42 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
 
     val numberLabels = listOf(primeiro, segundo, terceiro, quarto)
     val operatorLabels = listOf("+", "-", "÷", "x")
-
     val numbersInExpression = text.filter { it.isDigit() }.map { it.toString() }
-
     val finalResult = if (text.isNotEmpty() && text.last().isDigit() && numbersInExpression.size == 4) {
         evaluateExpression(text)
     } else {
         ""
     }
 
+    // <-- Aqui começa o Box principal
     Box(
         modifier = modifier
             .fillMaxSize()
+            .background(Color(0xFF2C2C2C))
             .padding(16.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween // Coloca a expressão em cima e os botões embaixo
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Display para a expressão sendo construída
             Text(
                 text = text.ifEmpty { "Forme 10" },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 64.dp),
                 fontSize = 48.sp,
-                color = Color.White, // Cor do texto principal
+                color = Color.White,
                 textAlign = TextAlign.Center
             )
 
-            // Painel para todos os botões
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Botões de número
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     numberLabels.forEach { label ->
-                        if (label.isNotEmpty()) { // Só mostra o botão se o número já foi carregado
+                        if (label.isNotEmpty()) {
                             Button(
                                 onClick = {
                                     val notUsedYet = !numbersInExpression.contains(label)
@@ -232,7 +202,6 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
                     }
                 }
 
-                // Botões de operador
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     operatorLabels.forEach { label ->
                         OutlinedButton(
@@ -250,9 +219,11 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
                     }
                 }
 
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(0.7f), color = Color.Gray)
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(0.7f),
+                    color = Color.Gray
+                )
 
-                // Botões de controle
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(
                         onClick = { text = "" },
@@ -261,11 +232,7 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
                         Text("Limpar", color = Color.White)
                     }
                     Button(
-                        onClick = {
-                            if (text.isNotEmpty()) {
-                                text = text.dropLast(1)
-                            }
-                        },
+                        onClick = { if (text.isNotEmpty()) text = text.dropLast(1) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                     ) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Apagar", tint = Color.White)
@@ -274,34 +241,28 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
             }
         }
 
-        // Overlay do resultado final
         if (finalResult.isNotEmpty()) {
             val resultadoComoNumero = finalResult.toIntOrNull()
             val vitoria = resultadoComoNumero == 10
 
-            // Este Effect executa a lógica de vitória apenas uma vez por nível.
             if (vitoria) {
                 LaunchedEffect(nivelAtual) {
-                    delay(2000) // Espera 2s para o jogador ver a mensagem
-                    nivelAtual++ // Avança para o próximo nível, o que vai disparar a busca de dados
+                    delay(2000)
+                    nivelAtual++
                 }
             }
 
             Box(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // 1. O resultado numérico
                     Text(
                         text = finalResult,
                         fontSize = 100.sp,
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
-
-                    // 2. A mensagem de vitória ou tentativa
                     if (vitoria) {
                         Text(
                             text = "Você Venceu!",
@@ -320,7 +281,6 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
         }
     }
 }
-
 
 @Preview(showSystemUi = true)
 @Composable
