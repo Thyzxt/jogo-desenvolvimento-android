@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +35,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import kotlinx.coroutines.delay
 import java.util.Stack
 
 class Jogo : ComponentActivity() {
@@ -45,7 +48,7 @@ class Jogo : ComponentActivity() {
             MyApplicationTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = Color(0xFF2C2C2C) // Fundo escuro
+                    containerColor = Color(color = 0xFF2C2C2C) // Fundo escuro
                 ) { innerPadding ->
                     ButtonGrid(
                         modifier = Modifier.padding(innerPadding)
@@ -115,7 +118,7 @@ private fun evaluateExpression(expression: String): String {
         return if (result == result.toLong().toDouble()) {
             result.toLong().toString()
         } else {
-            String.format("%.2f", result)
+            String.format(java.util.Locale.US, "%.2f", result)
         }
     } catch (e: Exception) {
         return ""
@@ -124,14 +127,51 @@ private fun evaluateExpression(expression: String): String {
 
 // --- Fim da Lógica de Cálculo ---
 
-val primeiro = "1"
-val segundo = "2"
-val terceiro = "3"
-val quarto = "4"
-
 @Composable
-fun ButtonGrid(modifier: Modifier = Modifier) {
+fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifier) {
     var text by remember { mutableStateOf("") }
+    var nivelAtual by remember { mutableStateOf(1) }
+
+    // Os números agora são estados que podem mudar
+    var primeiro by remember { mutableStateOf("") }
+    var segundo by remember { mutableStateOf("") }
+    var terceiro by remember { mutableStateOf("") }
+    var quarto by remember { mutableStateOf("") }
+
+    // Este Effect é executado sempre que `nivelAtual` muda.
+    LaunchedEffect(nivelAtual) {
+        // --- CÓDIGO FIREBASE (GENÉRICO) ---
+        // Este é o lugar para buscar os dados do nível no Firebase.
+        // Você precisará do SDK do Firebase configurado no seu projeto.
+        /*
+        val db = Firebase.firestore
+        db.collection("niveis").document(nivelAtual.toString())
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    primeiro = document.getString("primeiro") ?: "0"
+                    segundo = document.getString("segundo") ?: "0"
+                    terceiro = document.getString("terceiro") ?: "0"
+                    quarto = document.getString("quarto") ?: "0"
+                    text = "" // Limpa o campo de texto para a nova fase
+                } else {
+                    // Nível não encontrado, você pode tratar como fim de jogo
+                }
+            }
+            .addOnFailureListener { exception ->
+                // Tratar erro de conexão com o Firebase
+            }
+        */
+
+        // --- CÓDIGO PROVISÓRIO (para o app funcionar sem Firebase) ---
+        // Esta parte simula a busca de dados, gerando novos números.
+        // SUBSTITUA esta lógica pelo código do Firebase acima.
+        primeiro = (nivelAtual).toString()
+        segundo = (nivelAtual + 1).toString()
+        terceiro = (nivelAtual + 2).toString()
+        quarto = (nivelAtual + 3).toString()
+        text = ""
+    }
 
     val numberLabels = listOf(primeiro, segundo, terceiro, quarto)
     val operatorLabels = listOf("+", "-", "÷", "x")
@@ -173,19 +213,21 @@ fun ButtonGrid(modifier: Modifier = Modifier) {
                 // Botões de número
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     numberLabels.forEach { label ->
-                        Button(
-                            onClick = {
-                                val notUsedYet = !numbersInExpression.contains(label)
-                                val canAppendNumber = text.isEmpty() || !text.last().isDigit()
-                                if (notUsedYet && canAppendNumber) {
-                                    text += label
-                                }
-                            },
-                            shape = CircleShape,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                            modifier = Modifier.padding(4.dp)
-                        ) {
-                            Text(text = label, fontSize = 20.sp, color = Color.White)
+                        if (label.isNotEmpty()) { // Só mostra o botão se o número já foi carregado
+                            Button(
+                                onClick = {
+                                    val notUsedYet = !numbersInExpression.contains(label)
+                                    val canAppendNumber = text.isEmpty() || !text.last().isDigit()
+                                    if (notUsedYet && canAppendNumber) {
+                                        text += label
+                                    }
+                                },
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                Text(text = label, fontSize = 20.sp, color = Color.White)
+                            }
                         }
                     }
                 }
@@ -234,21 +276,51 @@ fun ButtonGrid(modifier: Modifier = Modifier) {
 
         // Overlay do resultado final
         if (finalResult.isNotEmpty()) {
+            val resultadoComoNumero = finalResult.toIntOrNull()
+            val vitoria = resultadoComoNumero == 10
+
+            // Este Effect executa a lógica de vitória apenas uma vez por nível.
+            if (vitoria) {
+                LaunchedEffect(nivelAtual) {
+                    delay(2000) // Espera 2s para o jogador ver a mensagem
+                    nivelAtual++ // Avança para o próximo nível, o que vai disparar a busca de dados
+                }
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = finalResult,
-                    fontSize = 100.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // 1. O resultado numérico
+                    Text(
+                        text = finalResult,
+                        fontSize = 100.sp,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+
+                    // 2. A mensagem de vitória ou tentativa
+                    if (vitoria) {
+                        Text(
+                            text = "Você Venceu!",
+                            fontSize = 40.sp,
+                            color = Color.Green
+                        )
+                    } else {
+                        Text(
+                            text = "Não foi 10!",
+                            fontSize = 40.sp,
+                            color = Color.Red
+                        )
+                    }
+                }
             }
         }
     }
 }
+
 
 @Preview(showSystemUi = true)
 @Composable

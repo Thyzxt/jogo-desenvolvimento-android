@@ -46,6 +46,10 @@ class MainActivity : ComponentActivity() {
                     composable("menu") {
                         TelaMenu(navController = navController)
                     }
+
+                    composable("jogo") {
+                        ButtonGrid(navController = navController)
+                    }
                 }
             }
         }
@@ -83,7 +87,12 @@ fun TelaMenu(navController: NavController) {
         ) {
             OpcaoMenu(
                 texto = "JOGAR",
-                cor = Color.Black
+                cor = Color.Black,
+                onClick = {
+                    navController.navigate("jogo") {
+                        popUpTo(0)
+                    }
+                }
             )
         }
 
@@ -96,7 +105,8 @@ fun TelaMenu(navController: NavController) {
         ) {
             OpcaoMenu(
                 texto = "COMO JOGAR",
-                cor = Color.Black
+                cor = Color.Black,
+                onClick = { }
             )
         }
 
@@ -109,19 +119,20 @@ fun TelaMenu(navController: NavController) {
         ) {
             OpcaoMenu(
                 texto = "CONFIGURAR",
-                cor = Color.Black
+                cor = Color.Black,
+                onClick = { }
             )
         }
     }
 }
 
 @Composable
-fun OpcaoMenu(texto: String, cor: Color) {
+fun OpcaoMenu(texto: String, cor: Color, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .padding(18.dp)
-            .clickable { },
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = cor),
         elevation = CardDefaults.cardElevation(6.dp)
@@ -172,6 +183,6 @@ fun TopBarMenu(navController: NavController) {
 @Composable
 fun MenuPreview() {
     MyApplicationTheme {
-        TelaLogin(navController = rememberNavController())
+        TelaMenu(navController = rememberNavController())
     }
 }
