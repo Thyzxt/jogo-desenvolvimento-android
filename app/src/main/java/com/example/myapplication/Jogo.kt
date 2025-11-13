@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.delay
 import java.util.Stack
@@ -52,6 +54,7 @@ class Jogo : ComponentActivity() {
                     containerColor = Color(color = 0xFF2C2C2C)
                 ) { innerPadding ->
                     ButtonGrid(
+                        navController = rememberNavController(),
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -167,11 +170,30 @@ fun ButtonGrid(navController: NavController? = null, modifier: Modifier = Modifi
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedButton(
+                    onClick = { navController?.popBackStack() },
+                    shape = CircleShape,
+                    border = BorderStroke(1.dp, Color.White)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Voltar",
+                        tint = Color.White
+                    )
+                }
+            }
+
             Text(
                 text = text.ifEmpty { "Forme 10" },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 64.dp),
+                    .offset(y = (-125).dp),
                 fontSize = 48.sp,
                 color = Color.White,
                 textAlign = TextAlign.Center

@@ -50,6 +50,12 @@ class MainActivity : ComponentActivity() {
                     composable("jogo") {
                         ButtonGrid(navController = navController)
                     }
+
+                    composable("admin") {
+                        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF2C2C2C))) {
+                            AdmScreen(navController = navController)
+                        }
+                    }
                 }
             }
         }
@@ -89,10 +95,7 @@ fun TelaMenu(navController: NavController) {
                 texto = "JOGAR",
                 cor = Color.Black,
                 onClick = {
-                    navController.navigate("jogo") {
-                        popUpTo(0)
-                    }
-                }
+                    navController.navigate("jogo")}
             )
         }
 
@@ -120,7 +123,7 @@ fun TelaMenu(navController: NavController) {
             OpcaoMenu(
                 texto = "CONFIGURAR",
                 cor = Color.Black,
-                onClick = { }
+                onClick = {navController.navigate("admin")}
             )
         }
     }
