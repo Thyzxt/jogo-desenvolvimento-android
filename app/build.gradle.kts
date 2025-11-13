@@ -63,6 +63,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
 }
 
+
 dependencies {
     implementation(libs.androidx.compose.foundation)
     val nav_version = "2.9.6"
