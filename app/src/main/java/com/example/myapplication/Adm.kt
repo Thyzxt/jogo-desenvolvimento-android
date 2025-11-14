@@ -364,7 +364,7 @@ private fun applyOp(a: Double, b: Double, op: Char): Double {
     }
 }
 
-private fun evaluateExpression(expression: String): String {
+fun evaluateExpression(expression: String): String {
     try {
         val values = Stack<Double>()
         val ops = Stack<Char>()

@@ -48,7 +48,8 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("jogo") {
-                        ButtonGrid(navController = navController)
+                        // Chame o GameScreen, que é o container inteligente da lógica do jogo.
+                        GameScreen(navController = navController)
                     }
 
                     composable("admin") {
