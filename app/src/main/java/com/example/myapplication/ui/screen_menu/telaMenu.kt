@@ -1,15 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.ui.screen_menu
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,47 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MyApplicationTheme {
-                val navController = rememberNavController()
-
-                NavHost(navController = navController, startDestination = "login") {
-
-                    composable("login") {
-                        TelaLogin(navController = navController)
-                    }
-
-                    composable("register") {
-                        TelaCad(navController = navController)
-                    }
-
-                    composable("menu") {
-                        TelaMenu(navController = navController)
-                    }
-
-                    composable("jogo") {
-                        // Chame o GameScreen, que é o container inteligente da lógica do jogo.
-                        GameScreen(navController = navController)
-                    }
-
-                    composable("comoJogar") {
-                        ComoJogarScreen(navController = navController)
-                    }
-
-                    composable("admin") {
-                        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF2C2C2C))) {
-                            AdmScreen(navController = navController)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun TelaMenu(navController: NavController) {
@@ -198,11 +148,3 @@ fun TopBarMenu(navController: NavController) {
     }
 }
 
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun MenuPreview() {
-    MyApplicationTheme {
-        TelaMenu(navController = rememberNavController())
-    }
-}
