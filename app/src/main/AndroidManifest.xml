@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
 
-        <activity android:name=".Jogo"
+        <activity android:name=".ui.game.Jogo"
             android:exported="true" />
 
         <activity android:name=".TelaCad"

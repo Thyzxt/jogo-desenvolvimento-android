@@ -4,205 +4,108 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.data.local.AppDatabase
+import com.example.myapplication.data.repository.GameRepository
+import com.example.myapplication.ui.common.MyViewModelFactory
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import com.example.myapplication.ui.screen_login.LoginViewModel
+import com.example.myapplication.ui.screen_login.TelaLogin
+import com.example.myapplication.ui.screen_cadastro.CadastroViewModel
+import com.example.myapplication.ui.screen_cadastro.TelaCad
+import com.example.myapplication.ui.screen_adm.AdmScreen
+import com.example.myapplication.ui.screen_adm.AdmViewModel
+import com.example.myapplication.ui.main.MainScreen // Tela principal com Bottom Nav
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+
+// As importações das rotas aninhadas (Jogo, Ranking, ComoJogar)
+// foram removidas deste arquivo, pois elas só são usadas DENTRO da MainScreen.kt.
 
 class MainActivity : ComponentActivity() {
+
+    //Injeção de Dependência Manual
+    private val database by lazy { AppDatabase.getDatabase(this) }
+    private val firestore by lazy { Firebase.firestore }
+    private val firebaseAuth by lazy { Firebase.auth }
+
+    private val repository by lazy { GameRepository(database.rankingDao(), firestore, firebaseAuth) }
+
+    private val viewModelFactory by lazy { MyViewModelFactory(repository) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
 
+                // O NAVHOST PRINCIPAL SÓ TEM 4 ROTAS (Login, Cadastro, Main, Admin)
                 NavHost(navController = navController, startDestination = "login") {
 
+                    // 1. Rota Login
                     composable("login") {
-                        TelaLogin(navController = navController)
+                        val loginViewModel: LoginViewModel = viewModel(factory = viewModelFactory)
+                        TelaLogin(
+                            viewModel = loginViewModel,
+                            onNavigateToRegister = {
+                                navController.navigate("register")
+                            },
+                            onNavigateToMenu = {
+                                // ROTA DE SUCESSO AGORA VAI PARA 'main'
+                                navController.navigate("main") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            },
+                            onNavigateToAdmin = {
+                                navController.navigate("admin") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            }
+                        )
                     }
 
+                    // 2. Rota Cadastro
                     composable("register") {
-                        TelaCad(navController = navController)
+                        val viewModel: CadastroViewModel = viewModel(factory = viewModelFactory)
+                        TelaCad(
+                            viewModel = viewModel,
+                            onNavigateBack = {
+                                navController.popBackStack()
+                            }
+                        )
                     }
 
-                    composable("menu") {
-                        TelaMenu(navController = navController)
+                    // 3. ROTA PRINCIPAL (HOST DO BOTTOM NAV BAR)
+                    composable("main") {
+                        MainScreen(
+                            factory = viewModelFactory, // Passamos a Factory para MainScreen instanciar os ViewModels internos
+                            mainNavController = navController // Passamos o NavController principal
+                        )
                     }
 
-                    composable("jogo") {
-                        // Chame o GameScreen, que é o container inteligente da lógica do jogo.
-                        GameScreen(navController = navController)
-                    }
-
-                    composable("comoJogar") {
-                        ComoJogarScreen(navController = navController)
-                    }
-
+                    // 4. ROTA ADMIN
                     composable("admin") {
-                        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF2C2C2C))) {
-                            AdmScreen(navController = navController)
-                        }
+                        val viewModel: AdmViewModel = viewModel(factory = viewModelFactory)
+                        AdmScreen(
+                            viewModel = viewModel,
+                            onNavigateBack = {
+                                navController.popBackStack()
+                            }
+                        )
                     }
+
+                    // AS ROTAS "JOGO", "RANKING" E "COMOJOGAR" SUMIRAM DAQUI
+                    // ELAS ESTÃO DENTRO DO NAVHOST ANINHADO NA MAINSCREEN
                 }
             }
         }
-    }
-}
-
-@Composable
-fun TelaMenu(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F5F5)),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        TopBarMenu(navController = navController)
-
-        Spacer(modifier = Modifier.height(95.dp))
-
-        Text(
-            text = "IGUAL A 10",
-            fontSize = 46.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(130.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            OpcaoMenu(
-                texto = "JOGAR",
-                cor = Color.Black,
-                onClick = {
-                    navController.navigate("jogo")}
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            OpcaoMenu(
-                texto = "COMO JOGAR",
-                cor = Color.Black,
-                onClick = { navController.navigate("comoJogar") }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            OpcaoMenu(
-                texto = "CONFIGURAR",
-                cor = Color.Black,
-                onClick = {navController.navigate("admin")}
-            )
-        }
-    }
-}
-
-@Composable
-fun OpcaoMenu(texto: String, cor: Color, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .padding(18.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = cor),
-        elevation = CardDefaults.cardElevation(6.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = texto,
-                fontSize = 18.sp,
-                color = Color.White
-            )
-        }
-    }
-}
-
-@Composable
-fun TopBarMenu(navController: NavController) {
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        IconButton(
-            onClick = {
-                navController.navigate("login") {
-                    popUpTo(0)
-                }
-            },
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Voltar (Logout)",
-                tint = Color.Black
-            )
-        }
-    }
-}
-
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun MenuPreview() {
-    MyApplicationTheme {
-        TelaMenu(navController = rememberNavController())
     }
 }
