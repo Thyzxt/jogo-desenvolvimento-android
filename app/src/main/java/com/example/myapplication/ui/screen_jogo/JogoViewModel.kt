@@ -66,7 +66,7 @@ class JogoViewModel(private val repository: GameRepository) : ViewModel() {
         }
     }
 
-    // Funções de interação (sem mudanças)
+
     fun onNumeroClick(numero: String) {
         val state = _uiState.value
         if (state.isGameOver) return

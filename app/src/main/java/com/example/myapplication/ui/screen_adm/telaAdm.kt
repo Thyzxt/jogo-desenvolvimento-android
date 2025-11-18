@@ -39,82 +39,89 @@ fun AdmScreen(
     val levels by viewModel.levelsList.collectAsState() // Lista do Room
     val context = LocalContext.current
 
-    // LÓGICA DE NAVEGAÇÃO INTERNA
-    if (!uiState.isTestingLevel) {
-        // Formulário de Criação e Lista do CRUD
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TopBarAdm(onNavigateBack = onNavigateBack)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF2C2C2C))
+    ){
 
-            Text(
-                text = "Criar Novo Nível",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // TEXTFIELDS
-            NumberTextField(value = uiState.primeiro, onValueChange = viewModel::onPrimeiroChange, label = "Primeiro Número")
-            NumberTextField(value = uiState.segundo, onValueChange = viewModel::onSegundoChange, label = "Segundo Número")
-            NumberTextField(value = uiState.terceiro, onValueChange = viewModel::onTerceiroChange, label = "Terceiro Número")
-            NumberTextField(value = uiState.quarto, onValueChange = viewModel::onQuartoChange, label = "Quarto Número")
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // BOTÃO DE TESTE
-            Button(
-                onClick = {
-                    if (uiState.primeiro.isNotBlank() && uiState.segundo.isNotBlank() && uiState.terceiro.isNotBlank() && uiState.quarto.isNotBlank()) {
-                        viewModel.onTestLevelClicked()
-                    } else {
-                        Toast.makeText(context, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
+        // LÓGICA DE NAVEGAÇÃO INTERNA
+        if (!uiState.isTestingLevel) {
+            // Formulário de Criação e Lista do CRUD
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Testar Nível")
-            }
+                TopBarAdm(onNavigateBack = onNavigateBack)
 
-            Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider(color = Color.Gray)
-            Text("Níveis Salvos (CRUD)", style = MaterialTheme.typography.headlineSmall, color = Color.White)
+                Text(
+                    text = "Criar Novo Nível",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // LISTA DE NÍVEIS
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(levels) { level ->
-                    LevelItem(
-                        level = level,
-                        onDelete = {
-                            viewModel.onDeleteLevel(level) // Delete do CRUD
+                // TEXTFIELDS
+                NumberTextField(value = uiState.primeiro, onValueChange = viewModel::onPrimeiroChange, label = "Primeiro Número")
+                NumberTextField(value = uiState.segundo, onValueChange = viewModel::onSegundoChange, label = "Segundo Número")
+                NumberTextField(value = uiState.terceiro, onValueChange = viewModel::onTerceiroChange, label = "Terceiro Número")
+                NumberTextField(value = uiState.quarto, onValueChange = viewModel::onQuartoChange, label = "Quarto Número")
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // BOTÃO DE TESTE
+                Button(
+                    onClick = {
+                        if (uiState.primeiro.isNotBlank() && uiState.segundo.isNotBlank() && uiState.terceiro.isNotBlank() && uiState.quarto.isNotBlank()) {
+                            viewModel.onTestLevelClicked()
+                        } else {
+                            Toast.makeText(context, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
                         }
-                    )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Testar Nível")
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(color = Color.Gray)
+                Text("Níveis Salvos (CRUD)", style = MaterialTheme.typography.headlineSmall, color = Color.White)
+
+                // LISTA DE NÍVEIS
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(levels) { level ->
+                        LevelItem(
+                            level = level,
+                            onDelete = {
+                                viewModel.onDeleteLevel(level) // Delete do CRUD
+                            }
+                        )
+                    }
                 }
             }
+        } else {
+            // TELA 2: Tela de Teste
+            LevelTestScreen(
+                numeros = listOf(uiState.primeiro, uiState.segundo, uiState.terceiro, uiState.quarto),
+                onLevelWon = {
+                    viewModel.onLevelTestWon()
+                },
+                onBackClick = {
+                    viewModel.onCancelTest()
+                }
+            )
         }
-    } else {
-        // TELA 2: Tela de Teste
-        LevelTestScreen(
-            numeros = listOf(uiState.primeiro, uiState.segundo, uiState.terceiro, uiState.quarto),
-            onLevelWon = {
-                viewModel.onLevelTestWon()
-            },
-            onBackClick = {
-                viewModel.onCancelTest()
-            }
-        )
-    }
 
-    // LOADING
-    if (uiState.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = Color.White)
+        // LOADING
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
+            }
         }
     }
 }

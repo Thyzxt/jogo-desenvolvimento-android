@@ -23,10 +23,8 @@ sealed interface LoginEvent {
     data class Error(val message: String) : LoginEvent
 }
 
-// O ViewModel agora é "limpo". Ele só fala com o Repositório.
 class LoginViewModel(private val repository: GameRepository) : ViewModel() {
 
-    // private val auth: FirebaseAuth = Firebase.auth
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
 

@@ -27,8 +27,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-// As importações das rotas aninhadas (Jogo, Ranking, ComoJogar)
-// foram removidas deste arquivo, pois elas só são usadas DENTRO da MainScreen.kt.
 
 class MainActivity : ComponentActivity() {
 
@@ -47,7 +45,6 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 val navController = rememberNavController()
 
-                // O NAVHOST PRINCIPAL SÓ TEM 4 ROTAS (Login, Cadastro, Main, Admin)
                 NavHost(navController = navController, startDestination = "login") {
 
                     // 1. Rota Login
@@ -59,7 +56,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("register")
                             },
                             onNavigateToMenu = {
-                                // ROTA DE SUCESSO AGORA VAI PARA 'main'
+
                                 navController.navigate("main") {
                                     popUpTo("login") { inclusive = true }
                                 }
@@ -101,9 +98,6 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
-
-                    // AS ROTAS "JOGO", "RANKING" E "COMOJOGAR" SUMIRAM DAQUI
-                    // ELAS ESTÃO DENTRO DO NAVHOST ANINHADO NA MAINSCREEN
                 }
             }
         }
